@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trabajo Final: Transformadas de Laplace y Fourier</title>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['$$', '$$']]
+            },
+            options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+        };
+    </script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            line-height: 1.5;
+            color: #000;
+            background: #d0d0d0;
+            padding: 20px;
+        }
+
+        /* Página tipo IEEE */
+        .page {
+            width: 215.9mm;
+            min-height: 279.4mm;
+            margin: 0 auto;
+            background: #fff;
+            padding: 19.1mm 12.7mm 25.4mm 12.7mm;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+        }
+
+        /* ── Cabecera del artículo ── */
+        .paper-title {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 20pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+            line-height: 1.3;
+            color: #000;
+        }
+
+        .author-block {
+            text-align: center;
+            font-size: 10pt;
+            margin-bottom: 4px;
+        }
+        .author-name { font-weight: bold; }
+        .author-affiliation { font-style: italic; color: #333; }
+
+        /* ── Abstract (ancho completo) ── */
+        .abstract-section {
+            margin: 14px 0 12px 0;
+        }
+        .abstract-section p {
+            font-size: 9pt;
+            text-align: justify;
+        }
+        .abstract-label {
+            font-style: italic;
+            font-weight: bold;
+        }
+        .keywords {
+            font-size: 9pt;
+            text-align: justify;
+            margin-top: 6px;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #000;
+            margin: 10px 0;
+        }
+
+        /* ── Layout doble columna IEEE ── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0 14px;
+        }
+
+        /* Elementos que ocupan todo el ancho */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* ── Secciones y encabezados ── */
+        h2 {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            margin: 10px 0 4px 0;
+            color: #000;
+        }
+
+        h3 {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            font-style: italic;
+            font-weight: bold;
+            margin: 8px 0 3px 0;
+            color: #000;
+        }
+
+        p {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 10pt;
+            text-align: justify;
+            margin-bottom: 6px;
+            hyphens: auto;
+        }
+
+        ul, ol {
+            font-size: 10pt;
+            padding-left: 16px;
+            margin-bottom: 6px;
+        }
+        li { margin-bottom: 3px; text-align: justify; }
+
+        /* ── Ecuaciones ── */
+        .math-block {
+            overflow-x: auto;
+            text-align: center;
+            margin: 6px 0;
+            font-size: 9.5pt;
+        }
+
+        /* ── Cajas de trabajo / notas pedagógicas ── */
+        .trabajo-sucio {
+            background-color: #f0f4f8;
+            border-left: 3px solid #2a6496;
+            padding: 5px 8px;
+            margin: 6px 0;
+            font-size: 9pt;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        /* ── Tablas IEEE ── */
+        .table-container {
+            margin: 8px 0;
+        }
+        .table-caption {
+            font-size: 9pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 4px;
+            font-variant: small-caps;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8.5pt;
+        }
+        table thead tr {
+            border-top: 1.5px solid #000;
+            border-bottom: 1px solid #000;
+        }
+        table tbody tr:last-child {
+            border-bottom: 1.5px solid #000;
+        }
+        th {
+            font-weight: bold;
+            text-align: center;
+            padding: 4px 5px;
+            font-size: 8.5pt;
+        }
+        td {
+            padding: 3px 5px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        /* ── Referencias ── */
+        .references p {
+            font-size: 9pt;
+            text-align: justify;
+            margin-bottom: 3px;
+            padding-left: 20px;
+            text-indent: -20px;
+        }
+
+        /* ── Número de columna ── */
+        .col-break { break-inside: avoid; }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .page { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page">
+
+    <!-- TÍTULO Y AUTORES (ancho completo) -->
+    <div class="paper-title">
+        Transformadas de Laplace y Fourier: Fundamentos y Aplicaciones en la Ingeniería Electrónica
+    </div>
+
+    <div class="author-block">
+        <span class="author-name">Eduin Andres Rivera Baez</span><br>
+        <span class="author-affiliation">FACULTAD DE INGENIERÍA, PROGRAMA DE INGENIERÍA ELECTRÓNICA UNIVERSIDAD INCCA DE COLOMBIA</span><br>
+        <span class="author-affiliation">eariverab@unincca.edu.co</span>
+    </div>
+
+    <!-- ABSTRACT Y KEYWORDS (ancho completo) -->
+    <div class="abstract-section">
+        <hr class="divider">
+        <p><span class="abstract-label">Resumen —</span> Este documento analiza los fundamentos conceptuales y aplicaciones prácticas de la transformada de Laplace y la transformada de Fourier, pilares matemáticos en el estudio de ecuaciones diferenciales aplicadas a la electrónica. Se aborda la resolución rigurosa de circuitos eléctricos mediante micro-pasos algebraicos y técnicas de modelado matemático preciso, incluyendo el análisis exacto de un circuito RLC serie bajo excitación de escalón. Asimismo, se examinan filtros ideales en el dominio frecuencial y se comparan ambos métodos destacando sus ventajas, limitaciones y contextos fundamentales de uso en el diseño de sistemas electrónicos.</p>
+        <p class="keywords"><span class="abstract-label">Términos clave —</span> Ecuaciones Diferenciales, Transformada de Laplace, Transformada de Fourier, Circuitos RLC, Procesamiento de Señales, Filtros, Función de Transferencia.</p>
+        <hr class="divider">
+    </div>
+
+    <!-- CUERPO A DOS COLUMNAS -->
+    <div class="two-col">
+
+        <!-- ════════════════════════════════════
+             COLUMNA 1 y 2 combinadas según flujo
+             ════════════════════════════════════ -->
+
+        <!-- I. INTRODUCCIÓN -->
+        <div>
+            <h2>I. Introducción</h2>
+            <p>El análisis riguroso de sistemas electrónicos, ya sean circuitos pasivos acoplados magnéticamente, amplificadores o filtros de señales, se fundamenta en principios físicos invariables descritos mediante Ecuaciones Diferenciales (ED) [1]. En ingeniería electrónica, resolver la dinámica transitoria de un circuito analizando oscilaciones de voltajes y corrientes en el dominio temporal \(t\) con métodos analíticos clásicos —como coeficientes indeterminados o variación de parámetros— puede volverse algebraicamente agobiante y propenso a errores.</p>
+            <p>Ante este reto matemático, las transformadas integrales nos proporcionan un puente seguro: permiten trasladar un problema desde el dominio de tiempo continuo hacia un dominio frecuencial (o complejo), donde la operación diferencial colapsa al álgebra de polinomios [2]. El presente trabajo estudia dos de las transformadas más relevantes para la electrónica: la de Laplace, orientada al análisis de transitorios y estabilidad, y la de Fourier, fundamental para el procesamiento espectral de señales.</p>
+        </div>
+
+        <!-- II. TRANSFORMADA DE LAPLACE -->
+        <div>
+            <h2>II. Transformada de Laplace</h2>
+
+            <h3>A. Definición y Propiedades Principales</h3>
+            <p>La Transformada de Laplace de una función continua a trozos \(f(t)\), definida para \(t \geq 0\), se denota \(\mathscr{L}\{f(t)\}\) y se define mediante la integración impropia [1]:</p>
+            <div class="math-block">
+                $$ \mathscr{L}\{f(t)\} = F(s) = \int_{0}^{\infty} f(t)\, e^{-st}\, dt $$
+            </div>
+            <p>La variable \(s = \sigma + j\omega\) es la <em>frecuencia compleja</em>. La integral converge para valores de \(s\) con parte real \(\sigma\) suficientemente grande, definiendo la <em>región de convergencia</em> (ROC). Las propiedades operativas fundamentales son:</p>
+            <ul>
+                <li><strong>Linealidad:</strong> \(\mathscr{L}\{af(t) + bg(t)\} = aF(s) + bG(s)\)</li>
+                <li><strong>Derivación (clave en ED):</strong>
+                    <div class="math-block">
+                        $$ \mathscr{L}\{y'(t)\} = sY(s) - y(0) $$
+                        $$ \mathscr{L}\{y''(t)\} = s^2Y(s) - sy(0) - y'(0) $$
+                    </div>
+                </li>
+                <li><strong>Desplazamiento en \(s\):</strong> \(\mathscr{L}\{e^{at}f(t)\} = F(s-a)\)</li>
+                <li><strong>Convolución:</strong> \(\mathscr{L}\{f*g\} = F(s)\cdot G(s)\)</li>
+                <li><strong>Transformada de \(e^{at}\):</strong> \(\mathscr{L}\{e^{at}\} = \frac{1}{s-a},\; s > a\)</li>
+                <li><strong>Escalón unitario \(u(t)\):</strong> \(\mathscr{L}\{u(t)\} = \frac{1}{s}\)</li>
+            </ul>
+
+            <h3>B. Procedimiento Algorítmico</h3>
+            <p>Para resolver EDs mediante Laplace se ejecuta el siguiente paso a paso. Se ilustra con la ED: \(y'' - 3y' + 2y = 0\), con \(y(0)=1\), \(y'(0)=0\).</p>
+ 
+            <p><strong>Paso 1 — Forma estándar:</strong> Verificar que todos los términos estén distribuidos al lado izquierdo con la excitación a la derecha.</p>
+            <div class="math-block">$$ y''(t) - 3y'(t) + 2y(t) = 0 $$</div>
+ 
+            <p><strong>Paso 2 — Transformación directa:</strong> Aplicar \(\mathscr{L}\) término a término por linealidad.</p>
+            <div class="math-block">$$ \mathscr{L}\{y''\} - 3\,\mathscr{L}\{y'\} + 2\,\mathscr{L}\{y\} = 0 $$</div>
+ 
+            <p><strong>Paso 3 — Insertar PVI:</strong> Expandir derivadas e introducir \(y(0)=1\), \(y'(0)=0\).</p>
+            <div class="math-block">$$ [s^2Y(s) - s(1) - 0] - 3[sY(s) - 1] + 2Y(s) = 0 $$</div>
+ 
+            <p><strong>Paso 4 — Agrupar y despejar:</strong> Recolectar términos con \(Y(s)\) y despejar.</p>
+            <div class="math-block">$$ Y(s)(s^2 - 3s + 2) = s - 3 $$</div>
+            <div class="math-block">$$ Y(s) = \frac{s - 3}{s^2 - 3s + 2} $$</div>
+ 
+            <p><strong>Paso 5 — Limpieza:</strong> El coeficiente de \(s^2\) ya es 1. Factorizar el denominador.</p>
+            <div class="math-block">$$ Y(s) = \frac{s-3}{(s-1)(s-2)} $$</div>
+ 
+            <p><strong>Paso 6 — Antitransformada:</strong> Fracciones parciales: \(\frac{s-3}{(s-1)(s-2)} = \frac{A}{s-1}+\frac{B}{s-2}\). Resolviendo, \(A=2\), \(B=-1\).</p>
+            <div class="math-block">$$ y(t) = \mathscr{L}^{-1}\!\left\{\frac{2}{s-1} - \frac{1}{s-2}\right\} = 2e^{t} - e^{2t} $$</div>
+        </div>
+
+        <!-- EJEMPLO RLC — columna completa para que quepan las ecuaciones -->
+        <div class="full-width">
+            <h2>III. Ejemplo Aplicado: Circuito RLC Serie</h2>
+        </div>
+
+        <div>
+            <p>Determinaremos la carga \(q(t)\) en un circuito RLC en serie con \(R\), \(L\) y \(C\) bajo una fuente escalón \(E(t)=V_0\,u(t)\). Estado de reposo absoluto: \(q(0)=0\), \(i(0)=q'(0)=0\).</p>
+
+            <h3>A. Modelado Matemático</h3>
+            <p>Aplicando la Ley de Voltajes de Kirchhoff (LVK) [3]:</p>
+            <div class="math-block">
+                $$ V_L + V_R + V_C = E(t) $$
+            </div>
+            <p>Sustituyendo \(V_L = L\frac{di}{dt}\), \(V_R = Ri\), \(V_C = \frac{q}{C}\) e \(i=q'\):</p>
+            <div class="math-block">
+                $$ L\,q''(t) + R\,q'(t) + \frac{1}{C}\,q(t) = V_0 $$
+            </div>
+
+            <h3>B. Transformación al Dominio \(s\)</h3>
+            <p>Aplicamos \(\mathscr{L}\) a cada término y usamos linealidad:</p>
+            <div class="math-block">
+                $$ L\,\mathscr{L}\{q''\} + R\,\mathscr{L}\{q'\} + \tfrac{1}{C}\mathscr{L}\{q\} = \frac{V_0}{s} $$
+            </div>
+            <p>Expandiendo las derivadas con el Teorema de Derivación:</p>
+            <div class="math-block">
+                $$ L[s^2Q(s) - sq(0) - q'(0)] + R[sQ(s) - q(0)] + \tfrac{Q(s)}{C} = \frac{V_0}{s} $$
+            </div>
+            <p>Con \(q(0)=0\) y \(q'(0)=0\) los términos de PVI se anulan:</p>
+            <div class="math-block">
+                $$ Q(s)\!\left[Ls^2 + Rs + \tfrac{1}{C}\right] = \frac{V_0}{s} $$
+            </div>
+        </div>
+
+        <div>
+            <div class="trabajo-sucio">
+                <strong>⚠Limpieza Algebraica:</strong> Para fracciones parciales, el coeficiente de \(s^2\) debe ser 1. Dividimos numerador y denominador por \(L\):
+            </div>
+            <div class="math-block">
+                $$ Q(s) = \frac{\dfrac{V_0}{L}}{s\!\left(s^2 + \dfrac{R}{L}s + \dfrac{1}{LC}\right)} $$
+            </div>
+
+            <h3>C. Análisis del Discriminante</h3>
+            <p>Las raíces del polinomio \(s^2 + \frac{R}{L}s + \frac{1}{LC}\) determinan la respuesta del circuito. Definimos \(\alpha = \frac{R}{2L}\) y \(\omega_0 = \frac{1}{\sqrt{LC}}\):</p>
+            <ul>
+                <li>Si \(\alpha > \omega_0\): respuesta <em>sobreamortiguada</em> (dos raíces reales distintas).</li>
+                <li>Si \(\alpha = \omega_0\): respuesta <em>críticamente amortiguada</em> (raíz real doble).</li>
+                <li>Si \(\alpha < \omega_0\): respuesta <em>subamortiguada</em> (raíces complejas conjugadas, oscilaciones).</li>
+            </ul>
+            <p>En el caso subamortiguado, con \(\omega_d = \sqrt{\omega_0^2 - \alpha^2}\), la antitransformada da:</p>
+            <div class="math-block">
+                $$ q(t) = \frac{V_0 C}{1}\!\left[1 - e^{-\alpha t}\!\left(\cos\omega_d t + \frac{\alpha}{\omega_d}\sin\omega_d t\right)\right] $$
+            </div>
+            <p>que corresponde a una oscilación amortiguada exponencialmente hacia el valor de estado estable \(q(\infty)=CV_0\).</p>
+        </div>
+
+        <!-- IV. TRANSFORMADA DE FOURIER -->
+        <div>
+            <h2>IV. Transformada de Fourier</h2>
+
+            <h3>A. Definición y Propiedades</h3>
+            <p>Restringiendo la variable de Laplace al eje imaginario puro (\(\sigma=0\), i.e. \(s=j\omega\)) obtenemos la Transformada de Fourier, herramienta central para el análisis espectral de señales [4]:</p>
+            <div class="math-block">
+                $$ \mathscr{F}\{f(t)\} = F(\omega) = \int_{-\infty}^{\infty} f(t)\,e^{-j\omega t}\,dt $$
+            </div>
+            <p>A diferencia de Laplace, la integral es <strong>bilateral</strong> \((-\infty,\infty)\) y la convergencia requiere que \(f(t)\) sea absolutamente integrable (\(f \in L^1\)). La <em>Transformada Inversa de Fourier</em> recupera la señal original:</p>
+            <div class="math-block">
+                $$ f(t) = \frac{1}{2\pi}\int_{-\infty}^{\infty} F(\omega)\,e^{j\omega t}\,d\omega $$
+            </div>
+            <p>Las propiedades más relevantes para aplicaciones en electrónica son:</p>
+            <ul>
+                <li><strong>Linealidad:</strong> \(\mathscr{F}\{af+bg\} = aF(\omega)+bG(\omega)\)</li>
+                <li><strong>Dualidad:</strong> Si \(\mathscr{F}\{f(t)\}=F(\omega)\), entonces \(\mathscr{F}\{F(t)\}=2\pi f(-\omega)\)</li>
+                <li><strong>Desplazamiento en frecuencia:</strong> \(\mathscr{F}\{f(t)e^{j\omega_0 t}\}=F(\omega-\omega_0)\)</li>
+                <li><strong>Convolución:</strong> \(\mathscr{F}\{f*g\} = F(\omega)\cdot G(\omega)\)</li>
+                <li><strong>Teorema de Parseval:</strong> \(\int_{-\infty}^{\infty}|f(t)|^2dt = \frac{1}{2\pi}\int_{-\infty}^{\infty}|F(\omega)|^2d\omega\)</li>
+                <li><strong>Delta de Dirac:</strong> \(\mathscr{F}\{\delta(t)\}=1\); \(\mathscr{F}\{1\}=2\pi\delta(\omega)\)</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>B. Interpretación en el Dominio de la Frecuencia</h3>
+            <p>A nivel fenomenológico, Fourier <em>descompone</em> una señal en el tiempo y revela qué armónicos la constituyen. El módulo \(|F(\omega)|\) es el <em>espectro de amplitud</em> y el argumento \(\angle F(\omega)\) es el <em>espectro de fase</em>. Esta representación es de capital importancia porque:</p>
+            <ul>
+                <li>Permite identificar visualmente el contenido frecuencial de una señal ruidosa.</li>
+                <li>Convierte la convolución en el tiempo (operación costosa) en una multiplicación punto a punto en frecuencia.</li>
+                <li>Fundamenta la operación de filtrado lineal invariante en el tiempo (LTI).</li>
+            </ul>
+
+            <h3>C. Ejemplo Aplicado: Filtro Paso-Bajos Ideal</h3>
+            <p>Un filtro paso-bajos ideal en frecuencia se describe por su función de transferencia en el dominio \(\omega\) [4]:</p>
+            <div class="math-block">
+                $$ H(\omega) = \begin{cases} 1 & |\omega| \leq \omega_c \\ 0 & |\omega| > \omega_c \end{cases} $$
+            </div>
+            <p>donde \(\omega_c\) es la frecuencia de corte. Si la señal de entrada tiene espectro \(X(\omega)\), la salida en frecuencia es simplemente \(Y(\omega) = H(\omega)\cdot X(\omega)\), eliminando todos los componentes de alta frecuencia. La respuesta impulsional de este filtro —su antitransformada de Fourier— es una función <em>sinc</em>:</p>
+            <div class="math-block">
+                $$ h(t) = \frac{\omega_c}{\pi}\,\text{sinc}\!\left(\frac{\omega_c t}{\pi}\right) = \frac{\sin(\omega_c t)}{\pi t} $$
+            </div>
+            <p>Este resultado pone de manifiesto que un filtro ideal es físicamente no causal (\(h(t) \neq 0\) para \(t < 0\)), razón por la cual en la práctica se usan aproximaciones como Butterworth, Chebyshev o Bessel.</p>
+        </div>
+
+        <!-- V. APLICACIONES EN ELECTRÓNICA -->
+        <div>
+            <h2>V. Aplicaciones en Electrónica</h2>
+
+            <h3>A. Análisis de Estabilidad (Laplace)</h3>
+            <p>Con Laplace se obtiene la <em>Función de Transferencia</em> del sistema, definida como:</p>
+            <div class="math-block">
+                $$ H(s) = \frac{Y(s)}{X(s)} = \frac{b_m s^m + \cdots + b_0}{a_n s^n + \cdots + a_0} $$
+            </div>
+            <p>Las raíces del denominador —los <em>polos</em>— determinan la estabilidad. Según el criterio de estabilidad BIBO [2]:</p>
+            <ul>
+                <li>Si todos los polos tienen parte real negativa (\(\text{Re}(p_k) < 0\)): sistema <em>estable</em>.</li>
+                <li>Si algún polo tiene parte real positiva (\(\text{Re}(p_k) > 0\)): sistema <em>inestable</em>.</li>
+                <li>Si los polos se encuentran sobre el eje imaginario: sistema <em>marginalmente estable</em>.</li>
+            </ul>
+            <p>Esta herramienta es esencial en el diseño de lazos de control en amplificadores retroalimentados, convertidores DC-DC y sistemas de control de motores.</p>
+        </div>
+
+        <div>
+            <h3>B. Filtrado y Procesamiento de Señales (Fourier)</h3>
+            <p>En telecomunicaciones y audio digital, la cadena de procesamiento típica emplea Fourier en tres etapas [5]:</p>
+            <ol>
+                <li><strong>Análisis:</strong> Se transforma la señal captada por una antena o micrófono hacia \(X(\omega)\), obteniendo su contenido espectral.</li>
+                <li><strong>Filtrado:</strong> Se multiplica el espectro por la respuesta en frecuencia del filtro \(H(\omega)\), eliminando selectivamente bandas no deseadas (ruido de alta frecuencia, interferencias de canal).</li>
+                <li><strong>Síntesis:</strong> Se aplica la antitransformada \(\mathscr{F}^{-1}\) para recuperar la señal limpia en el dominio temporal.</li>
+            </ol>
+            <p>La Transformada Discreta de Fourier (DFT) y su implementación eficiente mediante el algoritmo FFT (<em>Fast Fourier Transform</em>) hacen posible este procesamiento en tiempo real en procesadores de señal digitales (DSP), constituyendo la base de protocolos de comunicación modernos como OFDM, utilizado en redes 4G/5G y WiFi [5].</p>
+
+            <h3>C. Respuesta en Frecuencia y Diagramas de Bode</h3>
+            <p>Evaluando \(H(s)\) sobre el eje imaginario, \(s = j\omega\), se obtiene la <em>respuesta en frecuencia</em> \(H(j\omega)\). Los diagramas de Bode representan \(20\log_{10}|H(j\omega)|\) en dB y \(\angle H(j\omega)\) en grados frente a \(\omega\) en escala logarítmica, siendo instrumentos de diseño universales para filtros activos e instrumentación electrónica [2].</p>
+        </div>
+
+        <!-- VI. COMPARACIÓN (tabla ocupa ancho completo) -->
+        <div class="full-width">
+            <h2>VI. Comparación entre Ambas Transformadas</h2>
+
+            <div class="table-container">
+                <p class="table-caption">TABLA I<br>Comparación Sintética: Transformada de Laplace vs. Transformada de Fourier</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:22%">Criterio</th>
+                            <th style="width:39%">Transformada de Laplace</th>
+                            <th style="width:39%">Transformada de Fourier</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Dominio matemático</strong></td>
+                            <td>Plano complejo \(s = \sigma + j\omega\). Dos grados de libertad.</td>
+                            <td>Eje de frecuencia real \(\omega\). Un grado de libertad.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Rango de integración</strong></td>
+                            <td>Unilateral \([0^-, \infty)\). Evalúa el sistema desde su encendido.</td>
+                            <td>Bilateral \((-\infty, \infty)\). Analiza la señal en todo el tiempo.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Convergencia</strong></td>
+                            <td>Converge para mayor clase de funciones (basta con crecimiento exponencial acotado).</td>
+                            <td>Requiere señal absolutamente integrable \(f \in L^1\). Más restrictiva.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Condiciones iniciales</strong></td>
+                            <td>Las absorbe directamente en el Teorema de Derivación.</td>
+                            <td>No las incorpora; asume estado estable o señales de energía finita.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Relación entre ambas</strong></td>
+                            <td colspan="2" style="text-align:center;">\(\mathscr{F}\{f(t)\} = \mathscr{L}\{f(t)\}\big|_{s=j\omega}\) cuando la ROC incluye el eje imaginario.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Aplicación principal</strong></td>
+                            <td>Transitorios, estabilidad, control automático, encendido de sistemas.</td>
+                            <td>Régimen estacionario, filtrado de RF, modulación, análisis espectral.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Limitación clave</strong></td>
+                            <td>No ofrece interpretación espectral directa; requiere \(s=j\omega\).</td>
+                            <td>No apta para sistemas con condiciones iniciales no nulas ni inestables.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- VII. CONCLUSIONES -->
+        <div>
+            <h2>VII. Conclusiones</h2>
+            <p>La ingeniería electrónica no consiste en memorizar tablas, sino en la correcta manipulación de abstracciones matemáticas para predecir el comportamiento físico de los sistemas. En este análisis se demostró cómo las transformadas integrales convierten el cálculo diferencial en álgebra polinomial, permitiendo al ingeniero concentrar sus esfuerzos en interpretar las implicaciones dinámicas del sistema.</p>
+            <p>La Transformada de Laplace resulta superior cuando el sistema parte de condiciones iniciales no nulas o cuando el objetivo es el análisis de estabilidad: los polos de la función de transferencia en el plano \(s\) condensan toda la información dinámica del sistema. La Transformada de Fourier, por su parte, es la herramienta natural para el análisis espectral y el filtrado de señales en régimen estacionario, y su implementación discreta (FFT) vertebra las comunicaciones digitales modernas.</p>
+            <p>Ambas herramientas son complementarias e imprescindibles: Laplace gobierna el diseño y la estabilidad; Fourier gobierna el espectro y el procesamiento. Un ingeniero electrónico competente debe dominar ambas con igual profundidad.</p>
+        </div>
+
+        <!-- VIII. USO DE IA -->
+        <div>
+            <h2>VIII. Uso de Inteligencia Artificial</h2>
+            <p>Para el desarrollo de esta monografía se emplearon las siguientes herramientas de inteligencia artificial, en roles complementarios y diferenciados:</p>
+            <ul>
+                <li><strong>Google NotebookLM:</strong> Utilizado como base de investigación para estructurar y sintetizar fuentes académicas (Zill, Lathi, Oppenheim), generando notas organizadas sobre los conceptos matemáticos centrales de cada transformada.</li>
+                <li><strong>Google AI Studio (Gemini):</strong> Empleado para dar formato al contenido investigado, organizando los apartados del trabajo según las normas IEEE y generando el esquema narrativo de cada sección a partir del material del Notebook.</li>
+                <li><strong>Claude (Anthropic):</strong> Utilizado para la generación y revisión del código HTML final, la maquetación de doble columna estilo IEEE con MathJax, la corrección de micro-pasos algebraicos, la expansión de las secciones de Fourier y las aplicaciones, y la revisión crítica de coherencia técnica del documento completo.</li>
+            </ul>
+            <p>El estudiante asume la responsabilidad total del documento, habiendo verificado la exactitud de cada integral, el uso correcto del Teorema de Derivación, la veracidad de los conceptos de teoría de circuitos y la coherencia matemática de todos los resultados presentados.</p>
+        </div>
+
+        <!-- IX. REFERENCIAS (ancho completo) -->
+        <div class="full-width references">
+            <h2>IX. Referencias</h2>
+            <p>[1] D. G. Zill y M. R. Cullen, <em>Ecuaciones Diferenciales con Problemas de Valores en la Frontera</em>, 8.ª ed. México: Cengage Learning, 2013.</p>
+            <p>[2] N. S. Nise, <em>Control Systems Engineering</em>, 7.ª ed. Hoboken, NJ: John Wiley &amp; Sons, 2015.</p>
+            <p>[3] C. K. Alexander y M. N. O. Sadiku, <em>Fundamentos de Circuitos Eléctricos</em>, 5.ª ed. México: McGraw-Hill Interamericana, 2013.</p>
+            <p>[4] B. P. Lathi, <em>Linear Systems and Signals</em>, 2.ª ed. Oxford, UK: Oxford University Press, 2004.</p>
+            <p>[5] A. V. Oppenheim y A. S. Willsky, <em>Señales y Sistemas</em>, 2.ª ed. Naucalpan de Juárez, México: Pearson Educación, 1998.</p>
+        </div>
+
+    </div><!-- /two-col -->
+</div><!-- /page -->
+
+</body>
+</html>
